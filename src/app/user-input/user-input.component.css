@@ -1,0 +1,25 @@
+.auto-complete__form {
+  text-align: center;
+}
+
+.auto-complete__input, .auto-complete__button-wrapper {
+  display: inline-block;
+  vertical-align: top;
+}
+.auto-complete__input {
+  border: 1px solid #dadada;
+  height: 37px;
+  width: 300px;
+  padding: 0 10px;
+}
+
+.auto-complete__button {
+  background-color: #005fff;
+  cursor: pointer;
+  color: white;
+  border: 0;
+  width: 120px;
+  height: 39px;
+  margin-left: 15px;
+  line-height: 39px;
+}
