@@ -31,44 +31,26 @@ export class UserInputComponent {
   }
 
   InsertWordIntoTree(): void {
-    const INPUTWORDCOPY = [...this.inputTypedWord];
+    const inputWordCopy = [...this.inputTypedWord];
     let currentBranch = this.letter;
-
-    const traverseWordTree = (word, branch) => {
-      if (word.length < 1) {
-        branch.isEndOfWord = true;
-      }
-      if (branch.nextLetters.length < 1) {
-        this.AddRestOfWordToTree(word, branch);
-      } else {
-        const QUEUE = [...branch.nextLetters];
-        while (QUEUE.length) {
-            let nextBranch = QUEUE.shift();
-            if (nextBranch.letter === word[0]) {
-              let nextLetter = word.shift();
-              return traverseWordTree(word, nextBranch);
-            }
-        }
-        this.AddRestOfWordToTree(word, branch);
-      }
+    while (inputWordCopy.length) {
+      currentBranch = this.InsertLetterOrGetNextBranch(inputWordCopy, currentBranch);
     }
-    traverseWordTree(INPUTWORDCOPY, currentBranch);
+    currentBranch.isEndOfWord = true;
   }
 
-  AddRestOfWordToTree(word: string[], currentLevel: Letter): void {
-    while(word.length) {
-      let nextLetterForInsertion = word.shift();
-      currentLevel.nextLetters.unshift(new Letter(nextLetterForInsertion));
-      currentLevel = currentLevel.nextLetters[0];
+  InsertLetterOrGetNextBranch(inputWordCopy, currentBranch) {
+    let nextLetter = inputWordCopy.shift();
+    let lettersHashPosition = this.hash.getLettersHashCode(nextLetter);
+    if (!currentBranch.nextLetters[lettersHashPosition]) {
+      currentBranch.nextLetters[lettersHashPosition] = new Letter(nextLetter);
     }
-    currentLevel.isEndOfWord = true;
-    return;
+    return currentBranch.nextLetters[lettersHashPosition];
   }
 
   SearchAndDisplayWordList(): void {
-    // TODO: Fix the NULL at the beginning of each word when you press backspace and there is no other text inside the input.
-    const wordCopyForTraversal = [...this.inputTypedWord];
-    const treeLevelToStartAt = this.GetStartingPointForWordList(wordCopyForTraversal, this.letter);
+    const copyOfInputWOrd = [...this.inputTypedWord];
+    const treeLevelToStartAt = this.GetStartingPointForWordList(copyOfInputWOrd, this.letter);
     const listOfWordsToDisplay = this.GrabRestOfWordList(this.inputTypedWord, treeLevelToStartAt);
     if (listOfWordsToDisplay.length > 0) {
       console.clear();
@@ -77,15 +59,10 @@ export class UserInputComponent {
   }
 
   GetStartingPointForWordList(word, letterTreeLevel): Letter {
-    if (word.length > 0) {
-      let queue = [...letterTreeLevel.nextLetters];
-      while (queue.length) {
-        let frontBranch = queue.shift();
-        if (word[0] === frontBranch.letter) {
-          word.shift();
-          return this.GetStartingPointForWordList(word, frontBranch);
-        }
-      }
+    let nextLetter = word.shift();
+    let lettersHashPosition = this.hash.getLettersHashCode(nextLetter);
+    if (letterTreeLevel.nextLetters[lettersHashPosition]) {
+      return this.GetStartingPointForWordList(word, letterTreeLevel.nextLetters[lettersHashPosition]);
     }
     return letterTreeLevel;
   }
@@ -98,7 +75,6 @@ export class UserInputComponent {
       userTypedWord += currentTreeLevel.letter;
       if (currentTreeLevel.isEndOfWord === true) {
         foundWordsList.push(userTypedWord);
-        return;
       }
       if (currentTreeLevel.nextLetters.length > 0) {
         for (let i = 0; i < currentTreeLevel.nextLetters.length; i++) {
