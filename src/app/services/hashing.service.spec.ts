@@ -8,7 +8,7 @@ describe('HashingService', () => {
   })
 
   it ("Should return valid char code", () => {
-    let letterCode = hashing.getHashCode("a");
+    let letterCode = hashing.getLettersHashCode("a");
     expect(letterCode).toEqual(0);
   });
 });

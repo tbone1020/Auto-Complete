@@ -7,7 +7,7 @@ import { AHashing } from './ahashing';
 export class HashingService implements AHashing {
   constructor() { }
 
-  public getHashCode(letter: string): number {
+  public getLettersHashCode(letter: string): number {
     return letter.charCodeAt(0) - 97;
   }
 }

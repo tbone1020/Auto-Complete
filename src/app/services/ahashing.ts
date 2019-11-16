@@ -1,3 +1,3 @@
 export abstract class AHashing {
-  public abstract getHashCode(letter: string): number;
+  public abstract getLettersHashCode(letter: string): number;
 }
