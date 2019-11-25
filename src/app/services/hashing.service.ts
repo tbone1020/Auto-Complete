@@ -8,6 +8,6 @@ export class HashingService implements AHashing {
   constructor() { }
 
   public getLettersHashCode(letter: string): number {
-    return letter.charCodeAt(0) - 97;
+    return letter.charCodeAt(0);
   }
 }

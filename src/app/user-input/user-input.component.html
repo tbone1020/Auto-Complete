@@ -1,4 +1,11 @@
 <section class="auto-complete__form">
-  <input #treeInput class="auto-complete__input" type="text" (keyup)="CheckKeyPressInput($event)">
-  <button class="auto-complete__button" (click)="InsertWordIntoTree()">Search</button>
+  <input
+    #treeInput
+    class="auto-complete__input"
+    type="text"
+    (keyup.enter)="HandleUserSubmittingWord(treeInput)"
+    (keyup)="SearchTreeIfInputValueIsValid(treeInput)">
+  <button
+    class="auto-complete__button"
+    (click)="HandleUserSubmittingWord(treeInput)">Search</button>
 </section>

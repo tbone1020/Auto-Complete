@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { HashingService } from '../services/hashing.service';
 import { Letter } from '../models/letter';
 
@@ -10,36 +10,38 @@ import { Letter } from '../models/letter';
 
 export class UserInputComponent {
   public letter: Letter = new Letter(null);
-  public inputTypedWord: string[] = [];
+  public inputTypedWord: string = "";
   @Input() listOfResults: string[];
   @Output() listOfResultsChange = new EventEmitter<string[]>();
 
   constructor(private hash: HashingService) { }
 
-  CheckKeyPressInput(keyValue: any): void {
-    let isValidKey = this.CheckForInvalidKey(keyValue.key);
-    if(keyValue.key === "Enter") {
-      this.InsertWordIntoTree();
-    } else if (isValidKey) {
-      this.inputTypedWord = keyValue.target.value.toLowerCase().split('');
+  SearchTreeIfInputValueIsValid(keyValue: any): void {
+    this.inputTypedWord = keyValue.value.toLowerCase();
+    if (this.inputTypedWord !== "") {
       this.SearchAndDisplayWordList();
+    } else {
+      this.SendListOfWordsToBeDisplayed([]);
     }
   }
 
-  CheckForInvalidKey(keyInput: string): boolean {
-    return ["Shift", "CapsLock", "Control", "Alt", "Meta"].indexOf(keyInput) === -1;
+  HandleUserSubmittingWord(keyValue: any): void {
+    if (this.inputTypedWord !== "") {
+      keyValue.value = "";
+      this.InsertWordIntoTree();
+    }
   }
 
   InsertWordIntoTree(): void {
     const inputWordCopy = [...this.inputTypedWord];
     let currentBranch = this.letter;
     while (inputWordCopy.length) {
-      currentBranch = this.InsertLetterOrGetNextBranch(inputWordCopy, currentBranch);
+      currentBranch = this.InsertLetterAndGetNextBranch(inputWordCopy, currentBranch);
     }
     currentBranch.isEndOfWord = true;
   }
 
-  InsertLetterOrGetNextBranch(inputWordCopy, currentBranch) {
+  InsertLetterAndGetNextBranch(inputWordCopy, currentBranch) {
     let nextLetter = inputWordCopy.shift();
     let lettersHashPosition = this.hash.getLettersHashCode(nextLetter);
     if (!currentBranch.nextLetters[lettersHashPosition]) {
@@ -49,45 +51,53 @@ export class UserInputComponent {
   }
 
   SearchAndDisplayWordList(): void {
-    const copyOfInputWOrd = [...this.inputTypedWord];
-    const treeLevelToStartAt = this.GetStartingPointForWordList(copyOfInputWOrd, this.letter);
-    const listOfWordsToDisplay = this.GrabRestOfWordList(this.inputTypedWord, treeLevelToStartAt);
-    if (listOfWordsToDisplay.length > 0) {
-      console.clear();
-      console.log(listOfWordsToDisplay); // Send for list display
+    const inputWordToList = [...this.inputTypedWord];
+    const treeLevelToStartAt = this.GetStartingPointForWordList(inputWordToList);
+    if (treeLevelToStartAt) {
+      const listOfRetrievedWords = this.RetrieveListOfMatchingWords(this.inputTypedWord, treeLevelToStartAt);
+      this.SendListOfWordsToBeDisplayed(listOfRetrievedWords);
+    } else {
+      this.SendListOfWordsToBeDisplayed([]);
     }
   }
 
-  GetStartingPointForWordList(word, letterTreeLevel): Letter {
-    let nextLetter = word.shift();
-    let lettersHashPosition = this.hash.getLettersHashCode(nextLetter);
-    if (letterTreeLevel.nextLetters[lettersHashPosition]) {
-      return this.GetStartingPointForWordList(word, letterTreeLevel.nextLetters[lettersHashPosition]);
+  GetStartingPointForWordList(inputWordToList): Letter {
+    let letterTreeLevel = this.letter;
+    while (letterTreeLevel && inputWordToList.length) {
+      let nextLetter = inputWordToList.shift();
+      letterTreeLevel = this.GetNextBranch(nextLetter, letterTreeLevel);
     }
     return letterTreeLevel;
   }
 
-  GrabRestOfWordList(userTypedWord, treeLevel): string[] {
-    const foundWordsList = [];
-    let userTypedWordCombined = userTypedWord.join('').slice(0, -1);
+  GetNextBranch(nextLetter: string, treeLevel: Letter): Letter {
+    let lettersHashPosition = this.hash.getLettersHashCode(nextLetter);
+    if (treeLevel.nextLetters[lettersHashPosition]) {
+      return treeLevel.nextLetters[lettersHashPosition];
+    }
 
-    const traverseLTreeLevel = function(userTypedWord, currentTreeLevel) {
-      userTypedWord += currentTreeLevel.letter;
+  }
+
+  RetrieveListOfMatchingWords(userTypedWord, treeLevel): string[] {
+    const foundWordsList = [];
+    let userTypedWordClipped = userTypedWord.slice(0, -1);
+    const traverseTreeLevels = function(currentWordBuild, currentTreeLevel) {
+      currentWordBuild += currentTreeLevel.letter;
       if (currentTreeLevel.isEndOfWord === true) {
-        foundWordsList.push(userTypedWord);
+        foundWordsList.push(currentWordBuild);
       }
-      if (currentTreeLevel.nextLetters.length > 0) {
-        for (let i = 0; i < currentTreeLevel.nextLetters.length; i++) {
-          traverseLTreeLevel(userTypedWord, currentTreeLevel.nextLetters[i]);
+      for (let i = 0; i < currentTreeLevel.nextLetters.length; i++) {
+        if (currentTreeLevel.nextLetters[i]){
+          traverseTreeLevels(currentWordBuild, currentTreeLevel.nextLetters[i]);
         }
       }
     }
-    traverseLTreeLevel(userTypedWordCombined, treeLevel);
+    traverseTreeLevels(userTypedWordClipped, treeLevel);
     return foundWordsList;
   }
 
-  SendListOfWordsForDisplay(listOfWordsToDisplay: string[]): void {
-    this.listOfResultsChange.emit(["Words", "For", "Display", "List"]);
+  SendListOfWordsToBeDisplayed(listOfWordsToDisplay: string[]): void {
+    this.listOfResultsChange.emit(listOfWordsToDisplay);
   }
 
 }
