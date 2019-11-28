@@ -2,42 +2,20 @@ import { UserInputComponent } from './user-input.component';
 import { HashingService } from '../services/hashing.service';
 import { Letter } from '../models/letter';
 
-xdescribe('UserInputComponent', () => {
+describe('UserInputComponent', () => {
   let component: UserInputComponent = new UserInputComponent(new HashingService());
 
-  beforeAll(() => {
-    expect(component).toBeDefined();
+  it('Has instance of component', () => {
+    expect(component instanceof UserInputComponent).toBeDefined();
   })
 
   describe('Basic Functionality', () => {
+    beforeEach(() => {
+        component.inputTypedWord = "be";
+    });
 
-    it ('Checks if "inputTypedWord" is defined', () => {
+    it ('Has inputTypedWord variable', () => {
       expect(component.inputTypedWord).toBeDefined();
-    });
-
-    it ('Checks if "inputTypedWord" is an array', () => {
-      expect(Array.isArray(component.inputTypedWord)).toBe(true);
-    });
-
-    xit ('Assigns lowercase input to "inputTypedWord" variable', () => {
-
-      component.CheckKeyPressInput({
-        target: {
-          value: "TEST"
-        }
-      });
-
-      expect(component.inputTypedWord[0] === "t").toBe(true);
-      expect(component.inputTypedWord[2] === "s").toBe(true);
-      expect(component.inputTypedWord[3] === "t").toBe(true);
-    });
-
-    it ('Checks valid key for true', () => {
-      expect(component.CheckForInvalidKey('a')).toBe(true);
-    });
-
-    it ('Checks invalid keys for false', () => {
-      expect(component.CheckForInvalidKey('Shift')).toBe(false);
     });
   });
 
@@ -45,35 +23,55 @@ xdescribe('UserInputComponent', () => {
 
     beforeEach(() => {
       component.letter = new Letter(null);
-      component.inputTypedWord = ['b', 'e'];
+      component.inputTypedWord = "be";
       component.InsertWordIntoTree();
-      component.inputTypedWord = ['t', 'o'];
+      component.inputTypedWord = "to";
       component.InsertWordIntoTree();
     });
 
     it ('Has letter variable', () => {
-      // expect(component.letter).toBeDefined();
+      expect(component.letter).toBeDefined();
+    });
+
+    it('Checks if letter variable is correct type', () => {
+      expect(component.letter instanceof Letter).toBe(true);
     })
 
     it ('Checks if first word was inserted correctly into tree', () => {
-      expect(component.letter.nextLetters[0].letter === "t").toBe(true);
-      expect(component.letter.nextLetters[0].nextLetters[0].letter === "o").toBe(true);
+      expect(component.letter.nextLetters[19].letter === "t").toBe(true);
+      expect(component.letter.nextLetters[19].nextLetters[14].letter === "o").toBe(true);
     });
 
     it ('Checks if second word was inserted correctly into tree', () => {
       expect(component.letter.nextLetters[1].letter === "b").toBe(true);
-      expect(component.letter.nextLetters[1].nextLetters[0].letter === "e").toBe(true);
+      expect(component.letter.nextLetters[1].nextLetters[4].letter === "e").toBe(true);
     });
 
-    it ('Checks if "isendofword" variable is assigned correctly', () => {
-      expect(component.letter.nextLetters[0].nextLetters[0].isEndOfWord).toBe(true);
-    });
-
-    it ('Checks if "enter" adds word to tree', () => {
-      component.inputTypedWord = ['a'];
-      component.CheckKeyPressInput({key: 'Enter'});
+    it ('Checks if pressing enter adds word to tree', () => {
+      component.inputTypedWord = "a";
+      component.HandleUserSubmittingWord({
+        value: "a"
+      });
       expect(component.letter.nextLetters[0].letter === "a").toBe(true);
     });
 
-  })
+    it ('Checks if isEndofWord variable is assigned correctly', () => {
+      expect(component.letter.nextLetters[1].nextLetters[4].isEndOfWord).toBe(true);
+      expect(component.letter.nextLetters[19].nextLetters[14].isEndOfWord).toBe(true);
+    });
+  });
+
+  describe('Retrieving word', () => {
+    beforeEach(() => {
+      component.inputTypedWord = "travel";
+      component.InsertWordIntoTree();
+      component.inputTypedWord = "t";
+    });
+
+    it('Retrieves two words starting with the picked letter', () => {
+      const foundWords = component.SearchForWordsInTree(component.letter.nextLetters[19]);
+      expect(foundWords[0] === "<strong>t</strong>o").toBe(true);
+      expect(foundWords[1] === "<strong>t</strong>ravel").toBe(true);
+    });
+  });
 });

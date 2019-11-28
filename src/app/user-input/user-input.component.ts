@@ -51,20 +51,19 @@ export class UserInputComponent {
   }
 
   SearchAndDisplayWordList(): void {
-    const inputWordToList = [...this.inputTypedWord];
-    const treeLevelToStartAt = this.GetStartingPointForWordList(inputWordToList);
+    const wordConvertedToList = [...this.inputTypedWord];
+    const treeLevelToStartAt = this.GetStartingPointForWordList(wordConvertedToList);
     if (treeLevelToStartAt) {
-      const listOfRetrievedWords = this.RetrieveListOfMatchingWords(this.inputTypedWord, treeLevelToStartAt);
-      this.SendListOfWordsToBeDisplayed(listOfRetrievedWords);
+      this.GrabAndSendListWithBoldenText(treeLevelToStartAt);
     } else {
       this.SendListOfWordsToBeDisplayed([]);
     }
   }
 
-  GetStartingPointForWordList(inputWordToList): Letter {
+  GetStartingPointForWordList(wordConvertedToList): Letter {
     let letterTreeLevel = this.letter;
-    while (letterTreeLevel && inputWordToList.length) {
-      let nextLetter = inputWordToList.shift();
+    while (letterTreeLevel && wordConvertedToList.length) {
+      let nextLetter = wordConvertedToList.shift();
       letterTreeLevel = this.GetNextBranch(nextLetter, letterTreeLevel);
     }
     return letterTreeLevel;
@@ -75,25 +74,36 @@ export class UserInputComponent {
     if (treeLevel.nextLetters[lettersHashPosition]) {
       return treeLevel.nextLetters[lettersHashPosition];
     }
-
   }
 
-  RetrieveListOfMatchingWords(userTypedWord, treeLevel): string[] {
+  GrabAndSendListWithBoldenText(treeLevelToStartAt: Letter): void {
+    const listOfRetrievedWords = this.SearchForWordsInTree(treeLevelToStartAt);
+    this.SendListOfWordsToBeDisplayed(listOfRetrievedWords);
+  }
+
+  SearchForWordsInTree(treeLevel): string[] {
     const foundWordsList = [];
-    let userTypedWordClipped = userTypedWord.slice(0, -1);
+    let typedWordBolded = this.GetTypedWordWithStrongTags();
     const traverseTreeLevels = function(currentWordBuild, currentTreeLevel) {
-      currentWordBuild += currentTreeLevel.letter;
+      let wordBeforeNewLetter = currentWordBuild;
       if (currentTreeLevel.isEndOfWord === true) {
         foundWordsList.push(currentWordBuild);
       }
       for (let i = 0; i < currentTreeLevel.nextLetters.length; i++) {
+        currentWordBuild = wordBeforeNewLetter;
         if (currentTreeLevel.nextLetters[i]){
+          currentWordBuild += currentTreeLevel.nextLetters[i].letter;
           traverseTreeLevels(currentWordBuild, currentTreeLevel.nextLetters[i]);
         }
       }
     }
-    traverseTreeLevels(userTypedWordClipped, treeLevel);
+
+    traverseTreeLevels(typedWordBolded, treeLevel);
     return foundWordsList;
+  }
+
+  GetTypedWordWithStrongTags(): string {
+    return `<strong>${this.inputTypedWord}</strong>`;
   }
 
   SendListOfWordsToBeDisplayed(listOfWordsToDisplay: string[]): void {
