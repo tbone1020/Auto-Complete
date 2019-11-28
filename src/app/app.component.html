@@ -1,5 +1,9 @@
-<header>
-  <h1>Auto Complete</h1>
-</header>
-<app-user-input [(listOfResults)]="autoCompleteResults"></app-user-input>
-<app-auto-complete-list [listOfResults]="autoCompleteResults"></app-auto-complete-list>
+<section class="container">
+  <header>
+    <h1>Auto-Complete</h1>
+  </header>
+  <div class="form-list__container">
+    <app-user-input [(listOfResults)]="autoCompleteResults"></app-user-input>
+    <app-auto-complete-list [listOfResults]="autoCompleteResults"></app-auto-complete-list>
+  </div>
+</section>

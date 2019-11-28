@@ -4,8 +4,11 @@
     class="auto-complete__input"
     type="text"
     (keyup.enter)="HandleUserSubmittingWord(treeInput)"
-    (keyup)="SearchTreeIfInputValueIsValid(treeInput)">
+    (keyup)="SearchTreeIfInputValueIsValid(treeInput)"
+    (blur)="SendListOfWordsToBeDisplayed([])">
   <button
     class="auto-complete__button"
-    (click)="HandleUserSubmittingWord(treeInput)">Search</button>
+    (click)="HandleUserSubmittingWord(treeInput)">
+    <span class="fa fa-search"></span>
+  </button>
 </section>
