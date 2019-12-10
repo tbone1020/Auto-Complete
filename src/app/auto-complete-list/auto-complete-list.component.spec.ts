@@ -7,7 +7,7 @@ describe('AutoCompleteListComponent', () => {
     component = new AutoCompleteListComponent();
   });
 
-  it ('Checks If "listOfResults" Is An Array', () => {
+  it ('Checks If listOfResults Is An Array', () => {
     expect(Array.isArray(component.listOfResults)).toBe(true);
   });
 });
