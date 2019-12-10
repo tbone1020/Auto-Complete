@@ -1,5 +1,7 @@
 <section class="results" *ngIf="listOfResults.length > 0">
   <ul class="results-list">
-    <li class="results__item" *ngFor="let word of listOfResults" [innerHTML]="word"></li>
+    <ng-container *ngFor="let word of listOfResults">
+      <li #listElement class="results__item" (click)="RemoveTagsAndDisplayInInput(listElement)" [innerHTML]="word"></li>
+    </ng-container>
   </ul>
 </section>

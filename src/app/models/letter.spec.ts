@@ -11,11 +11,11 @@ describe('Letter Data Structure', () => {
     expect(letter.letter === 'a').toBe(true);
   });
 
-  it ('Checks for "isEndOfWOrd" Variable', () => {
+  it ('Has isEndOfWOrd', () => {
     expect(letter.isEndOfWord).toBe(false);
   });
 
-  it ('Checks if "nextLetters" Is An Array', () => {
+  it ('Checks if nextLetters Is An Array', () => {
     expect(Array.isArray(letter.nextLetters)).toBe(true)
   });
 

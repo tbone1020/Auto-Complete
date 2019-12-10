@@ -2,13 +2,14 @@
   <input
     #treeInput
     class="auto-complete__input"
+    value={{selectedWordFromList}}
     type="text"
-    (keyup.enter)="HandleUserSubmittingWord(treeInput)"
-    (keyup)="SearchTreeIfInputValueIsValid(treeInput)"
-    (blur)="SendListOfWordsToBeDisplayed([])">
+    (keyup.enter)="ClearInputAndSubmitInput(treeInput)"
+    (keyup)="SearchTreeIfTypedValueIsValid(treeInput)">
+    <!-- SAVE (blur)="SendListOfWordsToBeDisplayed([])" -->
   <button
     class="auto-complete__button"
-    (click)="HandleUserSubmittingWord(treeInput)">
+    (click)="ClearInputAndSubmitInput(treeInput)">
     <span class="fa fa-search"></span>
   </button>
 </section>

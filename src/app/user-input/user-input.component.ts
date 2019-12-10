@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { HashingService } from '../services/hashing.service';
 import { Letter } from '../models/letter';
 
@@ -8,16 +8,24 @@ import { Letter } from '../models/letter';
   styleUrls: ['./user-input.component.css']
 })
 
-export class UserInputComponent {
+export class UserInputComponent implements OnInit {
   public letter: Letter = new Letter(null);
   public inputTypedWord: string = "";
+  @Input() selectedWordFromList: string;
   @Input() listOfResults: string[];
   @Output() listOfResultsChange = new EventEmitter<string[]>();
 
-  constructor(private hash: HashingService) { }
+  constructor(private hash: HashingService) {}
 
-  SearchTreeIfInputValueIsValid(keyValue: any): void {
-    this.inputTypedWord = keyValue.value.toLowerCase();
+  ngOnInit() {
+    this.InsertWordIntoTree([..."flights from la to hong kong"])
+        .InsertWordIntoTree([..."flights from la to fort lauderdale"])
+        .InsertWordIntoTree([..."flights from la to boston"])
+        .InsertWordIntoTree([..."flights from la to tokyo"]);
+  }
+
+  SearchTreeIfTypedValueIsValid(typedWord: any): void {
+    this.inputTypedWord = typedWord.value.toLowerCase();
     if (this.inputTypedWord !== "") {
       this.SearchAndDisplayWordList();
     } else {
@@ -25,24 +33,25 @@ export class UserInputComponent {
     }
   }
 
-  HandleUserSubmittingWord(keyValue: any): void {
-    if (this.inputTypedWord !== "") {
-      keyValue.value = "";
-      this.InsertWordIntoTree();
+  ClearInputAndSubmitInput(typedValue: any): void {
+    if (typedValue.value !== "") {
+      let copyOfWord = typedValue.value.toLowerCase();
+      typedValue.value = "";
+      this.InsertWordIntoTree([...copyOfWord]);
     }
   }
 
-  InsertWordIntoTree(): void {
-    const inputWordCopy = [...this.inputTypedWord];
+  InsertWordIntoTree(inputWordToList: string[]): this {
     let currentBranch = this.letter;
-    while (inputWordCopy.length) {
-      currentBranch = this.InsertLetterAndGetNextBranch(inputWordCopy, currentBranch);
+    while (inputWordToList.length) {
+      currentBranch = this.InsertLetterAndGetNextBranch(inputWordToList, currentBranch);
     }
     currentBranch.isEndOfWord = true;
+    return this;
   }
 
-  InsertLetterAndGetNextBranch(inputWordCopy, currentBranch) {
-    let nextLetter = inputWordCopy.shift();
+  InsertLetterAndGetNextBranch(inputWordToList, currentBranch) {
+    let nextLetter = inputWordToList.shift();
     let lettersHashPosition = this.hash.getLettersHashCode(nextLetter);
     if (!currentBranch.nextLetters[lettersHashPosition]) {
       currentBranch.nextLetters[lettersHashPosition] = new Letter(nextLetter);
@@ -54,7 +63,7 @@ export class UserInputComponent {
     const wordConvertedToList = [...this.inputTypedWord];
     const treeLevelToStartAt = this.GetStartingPointForWordList(wordConvertedToList);
     if (treeLevelToStartAt) {
-      this.GrabAndSendListWithBoldenText(treeLevelToStartAt);
+      this.GetWordListToSend(treeLevelToStartAt);
     } else {
       this.SendListOfWordsToBeDisplayed([]);
     }
@@ -76,18 +85,18 @@ export class UserInputComponent {
     }
   }
 
-  GrabAndSendListWithBoldenText(treeLevelToStartAt: Letter): void {
-    const listOfRetrievedWords = this.SearchForWordsInTree(treeLevelToStartAt);
+  GetWordListToSend(treeLevelToStartAt: Letter): void {
+    const listOfRetrievedWords = this.SearchLetterTreeWithBoldResults(treeLevelToStartAt);
     this.SendListOfWordsToBeDisplayed(listOfRetrievedWords);
   }
 
-  SearchForWordsInTree(treeLevel): string[] {
+  SearchLetterTreeWithBoldResults(treeLevel): string[] {
     const foundWordsList = [];
-    let typedWordBolded = this.GetTypedWordWithStrongTags();
+    let typedWordBolded = this.GetTypedWordWithBoldTag();
     const traverseTreeLevels = function(currentWordBuild, currentTreeLevel) {
       let wordBeforeNewLetter = currentWordBuild;
       if (currentTreeLevel.isEndOfWord === true) {
-        foundWordsList.push(currentWordBuild);
+        foundWordsList.push(`${currentWordBuild}</strong>`);
       }
       for (let i = 0; i < currentTreeLevel.nextLetters.length; i++) {
         currentWordBuild = wordBeforeNewLetter;
@@ -102,8 +111,8 @@ export class UserInputComponent {
     return foundWordsList;
   }
 
-  GetTypedWordWithStrongTags(): string {
-    return `<strong>${this.inputTypedWord}</strong>`;
+  GetTypedWordWithBoldTag(): string {
+    return `${this.inputTypedWord}<strong>`;
   }
 
   SendListOfWordsToBeDisplayed(listOfWordsToDisplay: string[]): void {

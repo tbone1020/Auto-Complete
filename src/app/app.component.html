@@ -3,7 +3,7 @@
     <h1>Auto-Complete</h1>
   </header>
   <div class="form-list__container">
-    <app-user-input [(listOfResults)]="autoCompleteResults"></app-user-input>
-    <app-auto-complete-list [listOfResults]="autoCompleteResults"></app-auto-complete-list>
+    <app-user-input [selectedWordFromList]="selectedWordFromList" [(listOfResults)]="autoCompleteResults"></app-user-input>
+    <app-auto-complete-list [listOfResults]="autoCompleteResults" [(selectedWord)]="selectedWordFromList"></app-auto-complete-list>
   </div>
 </section>
