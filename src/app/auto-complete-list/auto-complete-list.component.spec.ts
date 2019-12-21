@@ -7,7 +7,12 @@ describe('AutoCompleteListComponent', () => {
     component = new AutoCompleteListComponent();
   });
 
-  it ('Checks If listOfResults Is An Array', () => {
+  it ('Checks if listOfResults is an array', () => {
     expect(Array.isArray(component.listOfResults)).toBe(true);
+  });
+
+  it ('Increments cycleListCount', () => {
+    component.IncremenetCycleCount();
+    expect(component.cycleListCount === 0).toBe(true);
   });
 });

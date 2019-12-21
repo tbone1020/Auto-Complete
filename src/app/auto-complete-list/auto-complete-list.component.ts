@@ -15,19 +15,19 @@ export class AutoCompleteListComponent {
   constructor() { }
 
   @HostListener('document:keyup', ['$event'])
-  CycleThroughResults(keyPressEvent: KeyboardEvent) {
+  HandleArrowAndTabKeyPress(keyPressEvent: KeyboardEvent): void {
     if (this.listOfResults.length > 0) {
-      this.CycleResultsIfArrowOrTabKeyWasPressed(keyPressEvent.key)
+      this.CycleThroughResults(keyPressEvent.key)
     }
   }
 
-  CycleResultsIfArrowOrTabKeyWasPressed(keyPressKey: string): void {
+  CycleThroughResults(keyPressKey: string): void {
     if (keyPressKey === "ArrowUp") {
       this.DecremenetCycleCount();
     } else if (keyPressKey === "ArrowDown") {
       this.IncremenetCycleCount();
     } else if (keyPressKey === "Tab") {
-      this.RemoveHTMLTagsAndDisplayInInput(this.listOfResults[this.cycleListCount]);
+      this.SendIfResultsIsHighlighted();
     }
   }
 
@@ -36,7 +36,7 @@ export class AutoCompleteListComponent {
     if (this.cycleListCount < 0) {
       this.cycleListCount = this.listOfResults.length - 1;
     }
-    this.HightlightAndDisplayIndexText();
+    this.HightlightListIndex();
   }
 
   IncremenetCycleCount(): void {
@@ -44,26 +44,28 @@ export class AutoCompleteListComponent {
     if (this.cycleListCount > this.listOfResults.length - 1) {
       this.cycleListCount = 0;
     }
-    this.HightlightAndDisplayIndexText();
+    this.HightlightListIndex();
   }
 
-  HightlightAndDisplayIndexText(): void {
-    let text = this.listOfResults[this.cycleListCount];
-    this.listOfResults[this.cycleListCount] = `<div class="current-highlighted-word">${text}</div>`;
+  HightlightListIndex(): void {
+    let resultText = this.listOfResults[this.cycleListCount];
+    this.listOfResults[this.cycleListCount] = `<div class="current-highlighted-word">${resultText}</div>`;
   }
 
-  RemoveHTMLTagsAndDisplayInInput(selectedListElement: string): void {
+  SendIfResultsIsHighlighted(): void {
+    let currentHighlightedTarget = this.listOfResults[this.cycleListCount];
+    if (this.cycleListCount !== -1) {
+      this.RemoveHTMLTagsAndSendToInput(currentHighlightedTarget);
+    }
+  }
+
+  GetClickedResultsValue(inputElement: HTMLElement): void {
+    this.RemoveHTMLTagsAndSendToInput(inputElement.innerHTML);
+  }
+
+  RemoveHTMLTagsAndSendToInput(selectedListElement: string): void {
     let textStrippedOfHTMLTags = this.RemoveHTMLTagsFromListElement(selectedListElement);
     this.SendWordToDisplayInInput(textStrippedOfHTMLTags);
-  }
-
-  RemoveTagsAndDisplayInInput(listItem: any): void {
-    const selectedTextWithoutTags = this.RemoveStrongTags(listItem.innerHTML);
-    this.SendWordToDisplayInInput(selectedTextWithoutTags)
-  }
-
-  RemoveStrongTags(listInnerText: string): string {
-    return listInnerText.replace("<strong>", "").replace("</strong>","");
   }
 
   RemoveHTMLTagsFromListElement(listInnerText: string): string {

@@ -18,10 +18,10 @@ export class UserInputComponent implements OnInit {
   constructor(private hash: HashingService) {}
 
   ngOnInit() {
-    this.InsertWordIntoTree([..."flights from la to hong kong"])
-        .InsertWordIntoTree([..."flights from la to fort lauderdale"])
-        .InsertWordIntoTree([..."flights from la to boston"])
-        .InsertWordIntoTree([..."flights from la to tokyo"]);
+    this.InsertWordIntoTree([..."flights from laguardia to chicago"]);
+    this.InsertWordIntoTree([..."flights from las vegas to new york city"]);
+    this.InsertWordIntoTree([..."flights from la to fort lauderdale"]);
+    this.InsertWordIntoTree([..."flights from la to tokyo"]);
   }
 
   SearchTreeIfTypedValueIsValid(typedWord: any): void {
@@ -33,6 +33,12 @@ export class UserInputComponent implements OnInit {
     }
   }
 
+  WaitForActionsAndClearResults(): void {
+    setTimeout(() => {
+      this.SendListOfWordsToBeDisplayed([]);
+    }, 160);
+  }
+
   ClearInputAndSubmitInput(typedValue: any): void {
     if (typedValue.value !== "") {
       let copyOfWord = typedValue.value.toLowerCase();
@@ -41,16 +47,15 @@ export class UserInputComponent implements OnInit {
     }
   }
 
-  InsertWordIntoTree(inputWordToList: string[]): this {
+  InsertWordIntoTree(inputWordToList: string[]): void {
     let currentBranch = this.letter;
     while (inputWordToList.length) {
       currentBranch = this.InsertLetterAndGetNextBranch(inputWordToList, currentBranch);
     }
     currentBranch.isEndOfWord = true;
-    return this;
   }
 
-  InsertLetterAndGetNextBranch(inputWordToList, currentBranch) {
+  InsertLetterAndGetNextBranch(inputWordToList, currentBranch): Letter {
     let nextLetter = inputWordToList.shift();
     let lettersHashPosition = this.hash.getLettersHashCode(nextLetter);
     if (!currentBranch.nextLetters[lettersHashPosition]) {
