@@ -1,0 +1,30 @@
+.github-icon {
+  position: absolute;
+  left: 0;
+  top: 50px;
+}
+.github-icon:hover .fa-github {
+  padding-left: 20px;
+}
+.github-icon:hover .fa-github, .fa-github {
+  -webkit-transition: all 300ms ease-out;
+  -moz-transition: all 300ms ease-out;
+  -ms-transition: all 300ms ease-out;
+  -o-transition: all 300ms ease-out;
+  transition: all 300ms ease-out;
+}
+.github__link {
+  -webkit-border-radius: 0 10px 10px 0;
+  border-radius: 0 10px 10px 0;
+  display: block;
+  color: #333;
+  position: relative;
+  text-decoration: none;
+  background: white;
+}
+.github__link:active {
+}
+.fa-github {
+  font-size: 30px;
+  padding: 5px 10px;
+}

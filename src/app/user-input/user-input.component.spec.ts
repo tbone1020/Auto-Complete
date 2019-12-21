@@ -23,10 +23,8 @@ describe('UserInputComponent', () => {
 
     beforeEach(() => {
       component.letter = new Letter(null);
-      component.inputTypedWord = "be";
-      component.InsertWordIntoTree();
-      component.inputTypedWord = "to";
-      component.InsertWordIntoTree();
+      component.InsertWordIntoTree([..."be"]);
+      component.InsertWordIntoTree([..."to"]);
     });
 
     it ('Has letter variable', () => {
@@ -47,14 +45,6 @@ describe('UserInputComponent', () => {
       expect(component.letter.nextLetters[1].nextLetters[4].letter === "e").toBe(true);
     });
 
-    it ('Checks if pressing enter adds word to tree', () => {
-      component.inputTypedWord = "a";
-      component.HandleUserSubmittingWord({
-        value: "a"
-      });
-      expect(component.letter.nextLetters[0].letter === "a").toBe(true);
-    });
-
     it ('Checks if isEndofWord variable is assigned correctly', () => {
       expect(component.letter.nextLetters[1].nextLetters[4].isEndOfWord).toBe(true);
       expect(component.letter.nextLetters[19].nextLetters[14].isEndOfWord).toBe(true);
@@ -63,13 +53,11 @@ describe('UserInputComponent', () => {
 
   describe('Retrieving word', () => {
     beforeEach(() => {
-      component.inputTypedWord = "travel";
-      component.InsertWordIntoTree();
-      component.inputTypedWord = "t";
+      component.InsertWordIntoTree([..."travel"]);
     });
 
     it('Retrieves two words starting with the picked letter', () => {
-      const foundWords = component.SearchLetterTreeWithBoldInput(component.letter.nextLetters[19]);
+      const foundWords = component.SearchLetterTreeWithBoldResults(component.letter.nextLetters[19]);
       // expect(foundWords[0] === "<strong>t</strong>o").toBe(true);
       // expect(foundWords[1] === "<strong>t</strong>ravel").toBe(true);
     });

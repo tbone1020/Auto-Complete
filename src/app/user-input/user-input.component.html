@@ -5,8 +5,8 @@
     value={{selectedWordFromList}}
     type="text"
     (keyup.enter)="ClearInputAndSubmitInput(treeInput)"
-    (keyup)="SearchTreeIfTypedValueIsValid(treeInput)">
-    <!-- SAVE (blur)="SendListOfWordsToBeDisplayed([])" -->
+    (keyup)="SearchTreeIfTypedValueIsValid(treeInput)"
+    (blur)="WaitForActionsAndClearResults()">
   <button
     class="auto-complete__button"
     (click)="ClearInputAndSubmitInput(treeInput)">
