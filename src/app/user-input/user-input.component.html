@@ -1,15 +1,14 @@
 <section class="auto-complete__form">
   <input
     #treeInput
-    class="auto-complete__input"
-    value={{selectedWordFromList}}
     type="text"
-    (keyup.enter)="ClearInputAndSubmitInput(treeInput)"
-    (keyup)="SearchTreeIfTypedValueIsValid(treeInput)"
-    (blur)="WaitForActionsAndClearResults()">
+    class="auto-complete__input"
+    (keyup.enter)="clearInputAndSubmitInput(treeInput)"
+    (keyup)="searchTreeIfTypedValueIsValid(treeInput)"
+    (blur)="waitForActionsThenClearResults()">
   <button
     class="auto-complete__button"
-    (click)="ClearInputAndSubmitInput(treeInput)">
+    (click)="clearInputAndSubmitInput(treeInput)">
     <span class="fa fa-search"></span>
   </button>
 </section>
