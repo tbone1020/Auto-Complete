@@ -10,7 +10,8 @@ export class AutoCompleteListComponent {
   @Input() listOfResults: string[] = [];
   @Input() selectedWord: string;
   @Output() selectedWordFromList = new EventEmitter<Object>();
-  private cycleListCount: number = -1;
+  private cycleCountStartingPoint: number = -1;
+  private cycleListCount: number = this.cycleCountStartingPoint;
 
   constructor() { }
 
@@ -53,7 +54,7 @@ export class AutoCompleteListComponent {
   }
 
   sendIfResultsIsHighlighted(): void {
-    if (this.cycleListCount !== -1) {
+    if (this.cycleListCount !== this.cycleCountStartingPoint) {
       let currentHighlightedTarget = this.listOfResults[this.cycleListCount];
       this.sendCleanSearchResultToInput(currentHighlightedTarget);
     }
@@ -82,6 +83,6 @@ export class AutoCompleteListComponent {
   }
 
   closeAutoCompleteList(): void {
-    this.cycleListCount = -1;
+    this.cycleListCount = this.cycleCountStartingPoint;
   }
 }

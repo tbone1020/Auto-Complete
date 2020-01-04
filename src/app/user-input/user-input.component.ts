@@ -90,6 +90,7 @@ export class UserInputComponent implements OnInit {
     if (treeLevel.nextLetters[lettersHashPosition]) {
       return treeLevel.nextLetters[lettersHashPosition];
     }
+    return null;
   }
 
   getWordListToSend(treeLevelToStartAt: Letter): void {
@@ -97,9 +98,9 @@ export class UserInputComponent implements OnInit {
     this.sendListOfWordsToBeDisplayed(listOfRetrievedWords);
   }
 
-  searchLetterTreeWithBoldResults(treeLevel): string[] {
+  searchLetterTreeWithBoldResults(treeLevel: Letter): string[] {
     const wordsFound = [];
-    let typedWordBolded = this.getTypedWordWithBoldTag();
+    let typedWordBolded = this.getTypedWordWithStartingBoldTag();
     const traverseTreeLevels = function(currentWordBuild, currentTreeLevel) {
       let wordBeforeNewLetter = currentWordBuild;
       if (currentTreeLevel.isEndOfWord === true) {
@@ -118,7 +119,7 @@ export class UserInputComponent implements OnInit {
     return wordsFound;
   }
 
-  getTypedWordWithBoldTag(): string {
+  getTypedWordWithStartingBoldTag(): string {
     return `${this.inputTypedWord}<strong>`;
   }
 
