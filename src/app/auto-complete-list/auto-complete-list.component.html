@@ -1,7 +1,7 @@
 <section class="results" *ngIf="listOfResults.length > 0">
   <ul class="results-list">
     <ng-container *ngFor="let word of listOfResults">
-      <li #listElement class="results__item" (click)="GetClickedResultsValue(listElement)" [innerHTML]="word"></li>
+      <li #listElement class="results__item" (click)="getClickedResultsValue(listElement)" [innerHTML]="word"></li>
     </ng-container>
   </ul>
 </section>

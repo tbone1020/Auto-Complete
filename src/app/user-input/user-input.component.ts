@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { HashingService } from '../services/hashing.service';
 import { Letter } from '../models/letter';
 
@@ -11,51 +11,53 @@ import { Letter } from '../models/letter';
 export class UserInputComponent implements OnInit {
   public letter: Letter = new Letter(null);
   public inputTypedWord: string = "";
-  @Input() selectedWordFromList: string;
-  @Input() listOfResults: string[];
-  @Output() listOfResultsChange = new EventEmitter<string[]>();
+  @Output() displayWordList = new EventEmitter<string[]>();
+  @ViewChild('treeInput', {static: true}) inputValue: ElementRef;
 
   constructor(private hash: HashingService) {}
 
   ngOnInit() {
-    this.InsertWordIntoTree([..."flights from laguardia to chicago"]);
-    this.InsertWordIntoTree([..."flights from las vegas to new york city"]);
-    this.InsertWordIntoTree([..."flights from la to fort lauderdale"]);
-    this.InsertWordIntoTree([..."flights from la to tokyo"]);
+    this.insertWordIntoTree([..."flights from laguardia to chicago"]);
+    this.insertWordIntoTree([..."travel from la to tokyo"]);
   }
 
-  SearchTreeIfTypedValueIsValid(typedWord: any): void {
+  @Input("selectedWordFromList")
+  set setInputWord(selectedSearchResult: any) {
+    this.inputValue.nativeElement.value = selectedSearchResult.selectedWord;
+  }
+
+  searchTreeIfTypedValueIsValid(typedWord: any): void {
     this.inputTypedWord = typedWord.value.toLowerCase();
     if (this.inputTypedWord !== "") {
-      this.SearchAndDisplayWordList();
+      this.searchAndDisplayWordList();
     } else {
-      this.SendListOfWordsToBeDisplayed([]);
+      this.sendListOfWordsToBeDisplayed([]);
     }
   }
 
-  WaitForActionsAndClearResults(): void {
+  waitForActionsThenClearResults(): void {
     setTimeout(() => {
-      this.SendListOfWordsToBeDisplayed([]);
-    }, 160);
+      this.sendListOfWordsToBeDisplayed([]);
+    }, 150);
   }
 
-  ClearInputAndSubmitInput(typedValue: any): void {
+  clearInputAndSubmitInput(typedValue: any): void {
     if (typedValue.value !== "") {
       let copyOfWord = typedValue.value.toLowerCase();
       typedValue.value = "";
-      this.InsertWordIntoTree([...copyOfWord]);
+      this.insertWordIntoTree([...copyOfWord]);
     }
   }
 
-  InsertWordIntoTree(inputWordToList: string[]): void {
+  insertWordIntoTree(inputWordToList: string[]): void {
     let currentBranch = this.letter;
     while (inputWordToList.length) {
-      currentBranch = this.InsertLetterAndGetNextBranch(inputWordToList, currentBranch);
+      currentBranch = this.insertLetterAndGetNextBranch(inputWordToList, currentBranch);
     }
     currentBranch.isEndOfWord = true;
   }
 
-  InsertLetterAndGetNextBranch(inputWordToList, currentBranch): Letter {
+  insertLetterAndGetNextBranch(inputWordToList, currentBranch): Letter {
     let nextLetter = inputWordToList.shift();
     let lettersHashPosition = this.hash.getLettersHashCode(nextLetter);
     if (!currentBranch.nextLetters[lettersHashPosition]) {
@@ -64,44 +66,44 @@ export class UserInputComponent implements OnInit {
     return currentBranch.nextLetters[lettersHashPosition];
   }
 
-  SearchAndDisplayWordList(): void {
+  searchAndDisplayWordList(): void {
     const wordConvertedToList = [...this.inputTypedWord];
-    const treeLevelToStartAt = this.GetStartingPointForWordList(wordConvertedToList);
+    const treeLevelToStartAt = this.getStartingPointForWordList(wordConvertedToList);
     if (treeLevelToStartAt) {
-      this.GetWordListToSend(treeLevelToStartAt);
+      this.getWordListToSend(treeLevelToStartAt);
     } else {
-      this.SendListOfWordsToBeDisplayed([]);
+      this.sendListOfWordsToBeDisplayed([]);
     }
   }
 
-  GetStartingPointForWordList(wordConvertedToList): Letter {
+  getStartingPointForWordList(wordConvertedToList): Letter {
     let letterTreeLevel = this.letter;
     while (letterTreeLevel && wordConvertedToList.length) {
       let nextLetter = wordConvertedToList.shift();
-      letterTreeLevel = this.GetNextBranch(nextLetter, letterTreeLevel);
+      letterTreeLevel = this.getNextBranch(nextLetter, letterTreeLevel);
     }
     return letterTreeLevel;
   }
 
-  GetNextBranch(nextLetter: string, treeLevel: Letter): Letter {
+  getNextBranch(nextLetter: string, treeLevel: Letter): Letter {
     let lettersHashPosition = this.hash.getLettersHashCode(nextLetter);
     if (treeLevel.nextLetters[lettersHashPosition]) {
       return treeLevel.nextLetters[lettersHashPosition];
     }
   }
 
-  GetWordListToSend(treeLevelToStartAt: Letter): void {
-    const listOfRetrievedWords = this.SearchLetterTreeWithBoldResults(treeLevelToStartAt);
-    this.SendListOfWordsToBeDisplayed(listOfRetrievedWords);
+  getWordListToSend(treeLevelToStartAt: Letter): void {
+    const listOfRetrievedWords = this.searchLetterTreeWithBoldResults(treeLevelToStartAt);
+    this.sendListOfWordsToBeDisplayed(listOfRetrievedWords);
   }
 
-  SearchLetterTreeWithBoldResults(treeLevel): string[] {
-    const foundWordsList = [];
-    let typedWordBolded = this.GetTypedWordWithBoldTag();
+  searchLetterTreeWithBoldResults(treeLevel): string[] {
+    const wordsFound = [];
+    let typedWordBolded = this.getTypedWordWithBoldTag();
     const traverseTreeLevels = function(currentWordBuild, currentTreeLevel) {
       let wordBeforeNewLetter = currentWordBuild;
       if (currentTreeLevel.isEndOfWord === true) {
-        foundWordsList.push(`${currentWordBuild}</strong>`);
+        wordsFound.push(`${currentWordBuild}</strong>`);
       }
       for (let i = 0; i < currentTreeLevel.nextLetters.length; i++) {
         currentWordBuild = wordBeforeNewLetter;
@@ -113,15 +115,15 @@ export class UserInputComponent implements OnInit {
     }
 
     traverseTreeLevels(typedWordBolded, treeLevel);
-    return foundWordsList;
+    return wordsFound;
   }
 
-  GetTypedWordWithBoldTag(): string {
+  getTypedWordWithBoldTag(): string {
     return `${this.inputTypedWord}<strong>`;
   }
 
-  SendListOfWordsToBeDisplayed(listOfWordsToDisplay: string[]): void {
-    this.listOfResultsChange.emit(listOfWordsToDisplay);
+  sendListOfWordsToBeDisplayed(listOfWordsToDisplay: string[]): void {
+    this.displayWordList.emit(listOfWordsToDisplay)
   }
 
 }
