@@ -7,12 +7,15 @@ describe('AutoCompleteListComponent', () => {
     component = new AutoCompleteListComponent();
   });
 
-  it ('Checks if listOfResults is an array', () => {
-    expect(Array.isArray(component.listOfResults)).toBe(true);
+  describe('When user presses tab or arrow keys', () => {
+
+    it ('Has cycleListCount', () => {
+      
+    });
+
+    it ('Increments cycleListCount', () => {
+
+    });
   });
 
-  it ('Increments cycleListCount', () => {
-    component.IncremenetCycleCount();
-    expect(component.cycleListCount === 0).toBe(true);
-  });
 });

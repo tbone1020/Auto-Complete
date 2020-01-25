@@ -1,27 +1,17 @@
 # AutoComplete
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.2.1.
+[Live Demo](http://www.tteebken.com/auto-complete)
 
-## Development server
+I wanted to experiment with data structures and one that has always interested me is the Trie Data Structure. Using Angular 8, I built auto-complete functionality that is similar to Google's.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+# Instructions
 
-## Code scaffolding
+It's best to use phrases that are similar such as:
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+1. "Travel from LA to Tokyo"
+2. "Travel from LA to New York"
+3. "Travel from LA to Chicago"
 
-## Build
+Typing in one phrase and pushing enter inserts that word into the Trie tree. Typing in another phrase will show the previously entered phrase.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+Results can be cycled through using the up "&#8593;" and down "&#8595;" arrow keys. The highlighted result can be added to the input by pushing the "Shift" key.  
